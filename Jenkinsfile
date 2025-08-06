@@ -9,6 +9,7 @@ pipeline {
         MONGO_URI = "mongodb+srv://supercluster.d83jj.mongodb.net/superData"
         MONGO_USERNAME = credentials('mongo-username')
         MONGO_PASSWORD = credentials('mongo-password')
+        SONAR_SCANNER_HOME = tool 'sonarqube-scanner-610'
     }
 
     stages {
@@ -35,6 +36,7 @@ pipeline {
                             --scan './'
                             --out './'
                             --format 'ALL'
+                            --disableYarnAudit
                             --prettyPrint
                         ''', odcInstallation: 'depcheck'
 
@@ -66,6 +68,21 @@ pipeline {
                             reportTitles: '',
                             useWrapperFileDirectly: true
                         ])
+            }
+        }
+        stage('sonarqube analysis') {
+            steps {
+                timeout(time: 60, unit: 'SECONDS') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh """
+                            ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=porsche \
+                            -Dsonar.sources=app.js \
+                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                        """
+                    }
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
     }
