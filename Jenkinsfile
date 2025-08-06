@@ -59,8 +59,9 @@ pipeline {
         stage('unit testin') {
             steps {
                     sh 'npm test'
+                    junit allowEmptyResults: true, testResults: 'test-results.xml'
+
             }
-            junit allowEmptyResults: true, testResults: 'test-results.xml'
         }
        stage('codecoverage') {
             steps {
