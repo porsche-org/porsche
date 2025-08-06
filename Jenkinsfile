@@ -5,9 +5,9 @@ pipeline {
         nodejs 'nodejs-22.6.0'
     }
 
-    environment {
-        MONGO_URI = "mongodb+srv://supercluster.d83jj.mongodb.net/superData"
-    }
+   // environment {
+     //   MONGO_URI = "mongodb+srv://supercluster.d83jj.mongodb.net/superData"
+    //}
 
     stages {
         stage('installing dependencies') {
@@ -58,19 +58,15 @@ pipeline {
 
         stage('unit testin') {
             steps {
-                //withCredentials([usernamePassword(credentialsId: 'envcred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     sh 'npm test'
-                //}
-                junit allowEmptyResults: true, testResults: 'test-results.xml'
             }
+            junit allowEmptyResults: true, testResults: 'test-results.xml'
         }
        stage('codecoverage') {
             steps {
-                //withCredentials([usernamePassword(credentialsId: 'envcred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     catchError(buildResult: 'SUCCESS', message: 'not an issue', stageResult: 'UNSTABLE') {
                         sh 'npm run coverage'
                     }
-                //}
                 publishHTML([
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
