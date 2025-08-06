@@ -170,6 +170,21 @@ pipeline {
         }
     }
 }
+stage('integration testing') {
+  when {
+    branch comparator: 'REGEXP', pattern: 'feature/.*'
+  }
+  steps {
+    withAWS(credentials: 'iam-login', region: 'ap-south-1') {
+      sh '''
+        echo "Running integration test script..."
+        chmod +x integration-testing-ec2.sh
+        ./integration-testing-ec2.sh
+      '''
+    }
+  }
+}
+
 
     }
 
