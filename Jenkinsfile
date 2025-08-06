@@ -60,9 +60,9 @@ pipeline {
             steps {
                 //withCredentials([usernamePassword(credentialsId: 'envcred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     sh 'npm test'
-                }
+                //}
                 junit allowEmptyResults: true, testResults: 'test-results.xml'
-           // }
+            }
         }
        stage('codecoverage') {
             steps {
