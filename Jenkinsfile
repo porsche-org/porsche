@@ -56,7 +56,7 @@ pipeline {
             }
         }
 
-        stage('unit testing') {
+        stage('unit testin') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'env1', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     sh 'npm test'
