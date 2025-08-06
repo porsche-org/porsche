@@ -136,6 +136,13 @@ pipeline {
                 }
             }
         }
+        stage('docker push'){
+            steps{
+                withDockerRegistry(credentialsId: 'docker-cred', url: "") {
+                    sh 'docker push chakribaggam123/demo:$GIT_COMMIT'
+                }
+            }
+        }
     }
 
     post {
