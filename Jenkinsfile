@@ -58,10 +58,30 @@ pipeline {
 
         stage('unit testin') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'envcred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                //withCredentials([usernamePassword(credentialsId: 'envcred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     sh 'npm test'
                 }
                 junit allowEmptyResults: true, testResults: 'test-results.xml'
+            }
+        }
+       stage('codecoverage') {
+            steps {
+                //withCredentials([usernamePassword(credentialsId: 'envcred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                    catchError(buildResult: 'SUCCESS', message: 'not an issue', stageResult: 'UNSTABLE') {
+                        sh 'npm run coverage'
+                    }
+                }
+                publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: true,
+                            icon: '',
+                            keepAll: true,
+                            reportDir: 'coverage/lcov-report',
+                            reportFiles: 'index.html',
+                            reportName: 'code coverage Report',
+                            reportTitles: '',
+                            useWrapperFileDirectly: true
+                        ])
             }
         }
     }
