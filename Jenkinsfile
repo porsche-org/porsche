@@ -62,7 +62,7 @@ pipeline {
                     sh 'npm test'
                 }
                 junit allowEmptyResults: true, testResults: 'test-results.xml'
-            }
+           // }
         }
        stage('codecoverage') {
             steps {
@@ -70,7 +70,7 @@ pipeline {
                     catchError(buildResult: 'SUCCESS', message: 'not an issue', stageResult: 'UNSTABLE') {
                         sh 'npm run coverage'
                     }
-                }
+                //}
                 publishHTML([
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
