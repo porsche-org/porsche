@@ -143,6 +143,34 @@ pipeline {
                 }
             }
         }
+        stage('Deploy in EC2') {
+    when {
+        branch pattern: "feature/.*", comparator: "REGEXP"
+    }
+    steps {
+        script {
+            sshagent(['ssh']) {
+                sh """
+                ssh -o StrictHostKeyChecking=no ubuntu@15.206.125.203 '
+                    if sudo docker ps -a | grep -q "solar-system"; then
+                        echo "Container found. Stopping..."
+                        sudo docker stop solar-system && sudo docker rm solar-system
+                        echo "Container stopped and removed."
+                    fi
+
+                    echo "Running new container..."
+                    sudo docker run --name solar-system \\
+                        -e MONGO_URI=${env.MONGO_URI} \\
+                        -e MONGO_USERNAME=${env.MONGO_USERNAME} \\
+                        -e MONGO_PASSWORD=${env.MONGO_PASSWORD} \\
+                        -p 3000:3000 -d chakribaggam123/demo:${GIT_COMMIT}
+                '
+                """
+            }
+        }
+    }
+}
+
     }
 
     post {
