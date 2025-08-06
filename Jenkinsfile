@@ -58,7 +58,7 @@ pipeline {
 
         stage('unit testin') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'env1', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                withCredentials([usernamePassword(credentialsId: 'envcred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     sh 'npm test'
                 }
                 junit allowEmptyResults: true, testResults: 'test-results.xml'
