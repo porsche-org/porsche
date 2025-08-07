@@ -232,6 +232,33 @@ stage('updating the image'){
     """
    }
 }
+stage("app deployed"){
+            steps{
+                timeout(time: 1, unit: 'DAYS') {
+                    input {
+                      message 'is new version of the app synced and deployed', ok 'yes'
+                    }
+                }
+            }
+        }
+        stage('DAST - OWASP ZAP') {
+    when {
+        branch 'PR*'
+    }
+    steps {
+        sh '''
+        ##### REPLACE below with Kubernetes http://IP_Address:30000/api-docs/ #####
+        chmod 777 $(pwd)
+        docker run -v $(pwd):/zap/wrk/:rw ghcr.io/zaproxy/zap-api-scan.py \
+        -t http://3.110.197.100:30000/api-docs/ \
+        -f openapi \
+        -r zap_report.html \
+        -w zap_report.md \
+        -J zap_json_report.json \
+        -x zap_xml_report.xml
+        '''
+    }
+}
 
     }
 
