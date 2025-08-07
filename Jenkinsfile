@@ -232,16 +232,15 @@ stage('updating the image'){
     """
    }
 }
-stage("app deployed"){
-            steps{
-                timeout(time: 1, unit: 'DAYS') {
-                    input {
-                      message 'is new version of the app synced and deployed', ok 'yes'
-                    }
-                }
-            }
+stage("app deployed") {
+    steps {
+        timeout(time: 1, unit: 'DAYS') {
+            input message: 'Is the new version of the app synced and deployed?', ok: 'Yes'
         }
-        stage('DAST - OWASP ZAP') {
+    }
+}
+
+stage('DAST - OWASP ZAP') {
     when {
         branch 'PR*'
     }
@@ -259,6 +258,7 @@ stage("app deployed"){
         '''
     }
 }
+
 
     }
 
