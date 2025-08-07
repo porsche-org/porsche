@@ -10,6 +10,7 @@ pipeline {
         MONGO_USERNAME = credentials('mongo-username')
         MONGO_PASSWORD = credentials('mongo-password')
         SONAR_SCANNER_HOME = tool 'sonarqube-scanner-610'
+        GIT_TOKEN = credentials('GIT_TOKEN')
     }
 
     stages {
@@ -184,12 +185,43 @@ stage('integration testing') {
     }
   }
 }
+stage('updating the image'){
+            when {
+              branch 'PR*'
+            }
+            steps{
+                sh 'git clone -b main https://github.com/porsche-org/gi.git'
+        dir('gi/kubernetes') {
+            sh '''
+                ##### Replace Docker Tag #####
+                git checkout main
+                git checkout -b feature-$BUILD_ID
+                sed -i "s#chakribaggam123.*#chakribaggam123/demo:$GIT_COMMIT#g" deployment.yml
+                cat deployment.yml
+
+
+                ##### Commit and Push to Feature Branch #####
+                git config --global user.email "chakrachandb@gmail.com"
+                git config --global user.name "chakribaggam456"
+                git remote set-url origin https://$GIT_TOKEN@github.com/porsche-org/gi.git
+                git add .
+                git commit -am "Updated docker image"
+                git push -u origin feature-$BUILD_ID
+            '''
+            }
+            }
+        }
 
 
     }
 
     post {
         always {
+            script {
+                if (fileExists('gi')) {
+                    sh 'rm -rf gi'
+                }
+            }
             // JUnit reports
             junit allowEmptyResults: true, testResults: 'dependency-check-junit.xml'
             junit allowEmptyResults: true, testResults: 'image-critical-results.xml'
